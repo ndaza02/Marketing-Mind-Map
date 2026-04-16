@@ -13,6 +13,23 @@ const mindMapData = {
       color: "blue",
       children: [
         {
+          label: "Review Weekly Targets",
+          children: [{ label: "500 new logos / year" }, { label: "250 leads / month" }, { label: "Weekly pacing" }]
+        },
+        {
+          label: "Review Campaign Plan",
+          children: [
+            { label: "Content calendar" },
+            { label: "Ads" },
+            { label: "Events / Partnerships" },
+            { label: "Website work" }
+          ]
+        },
+        {
+          label: "Prepare Assets",
+          children: [{ label: "Creatives" }, { label: "CTAs" }, { label: "Forms" }, { label: "Tracking links" }]
+        },
+        {
           label: "ClickUp Lists (Setup)",
           fields: ["Brand", "Primary KPI", "Campaign Name", "Channel", "Marketing Owner"],
           children: [
