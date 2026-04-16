@@ -1,5 +1,15 @@
 import { useState, useRef } from 'react';
-import { Info, ShieldCheck, ArrowRightLeft, MousePointer2, Hash, Activity } from 'lucide-react';
+import {
+  Info,
+  ShieldCheck,
+  ArrowRightLeft,
+  MousePointer2,
+  Hash,
+  Activity,
+  ZoomIn,
+  ZoomOut,
+  Maximize
+} from 'lucide-react';
 
 const mindMapData = {
   label: "Marketing SOP Task Lifecycle",
@@ -308,6 +318,7 @@ const MindMapNode = ({ node, isRoot = false }) => {
 export default function App() {
   const scrollRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [zoom, setZoom] = useState(0.85);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
 
   const handleMouseDown = (e) => {
@@ -330,24 +341,64 @@ export default function App() {
     scrollRef.current.scrollTop = dragStart.scrollTop - (y - dragStart.y);
   };
 
+  const handleZoom = (delta) => {
+    setZoom((prev) => Math.min(Math.max(prev + delta, 0.4), 1.5));
+  };
+
+  const resetZoom = () => setZoom(0.85);
+
   return (
     <div className="relative w-full h-screen overflow-hidden bg-[#f8fafc] font-sans flex flex-col">
-      <div className="absolute top-0 w-full p-4 pointer-events-none z-50 flex justify-center">
-        <div className="bg-white/90 backdrop-blur px-6 py-3 rounded-full shadow-md text-xs font-bold text-slate-700 flex items-center gap-3 border border-slate-200 uppercase tracking-widest">
-          <MousePointer2 size={16} className="text-blue-500 animate-pulse" /> Pan to explore • Collapse nodes for clarity
+      <div className="absolute top-0 w-full p-4 pointer-events-none z-50 flex justify-between items-center">
+        <div className="bg-white/90 backdrop-blur px-6 py-3 rounded-full shadow-md text-xs font-bold text-slate-700 flex items-center gap-3 border border-slate-200 uppercase tracking-widest pointer-events-auto">
+          <MousePointer2 size={16} className="text-blue-500 animate-pulse" /> Drag to Pan • +/- to Collapse
+        </div>
+
+        <div className="bg-white/90 backdrop-blur p-1 rounded-2xl shadow-md border border-slate-200 flex items-center gap-1 pointer-events-auto">
+          <button
+            onClick={() => handleZoom(-0.1)}
+            className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-600"
+            title="Zoom Out"
+          >
+            <ZoomOut size={20} />
+          </button>
+          <div className="w-16 text-center text-[11px] font-black text-slate-400 tabular-nums">
+            {Math.round(zoom * 100)}%
+          </div>
+          <button
+            onClick={() => handleZoom(0.1)}
+            className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-600"
+            title="Zoom In"
+          >
+            <ZoomIn size={20} />
+          </button>
+          <div className="w-[1px] h-6 bg-slate-200 mx-1" />
+          <button
+            onClick={resetZoom}
+            className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-600"
+            title="Reset Zoom"
+          >
+            <Maximize size={18} />
+          </button>
         </div>
       </div>
 
       <div
         ref={scrollRef}
         className={`w-full h-full overflow-auto ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-        style={{ backgroundImage: 'radial-gradient(#e2e8f0 1px, transparent 1px)', backgroundSize: '30px 30px' }}
+        style={{
+          backgroundImage: 'radial-gradient(#e2e8f0 1.5px, transparent 1.5px)',
+          backgroundSize: `${30 * zoom}px ${30 * zoom}px`
+        }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={() => setIsDragging(false)}
         onMouseLeave={() => setIsDragging(false)}
       >
-        <div className="min-w-max p-40 flex justify-start items-center min-h-[120%]">
+        <div
+          className="min-w-max p-40 flex justify-start items-center min-h-[120%] origin-left"
+          style={{ transform: `scale(${zoom})`, transition: 'transform 0.1s ease-out' }}
+        >
           <MindMapNode node={mindMapData} isRoot={true} />
         </div>
       </div>
